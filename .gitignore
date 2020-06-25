@@ -17,6 +17,7 @@
 *.ipr
 /.idea
 *.bak
+*.log
 
 ### NetBeans ###
 /nbproject/private/

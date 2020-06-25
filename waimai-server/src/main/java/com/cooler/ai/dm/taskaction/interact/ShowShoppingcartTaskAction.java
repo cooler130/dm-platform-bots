@@ -2,6 +2,7 @@ package com.cooler.ai.dm.taskaction.interact;
 
 import com.cooler.ai.dm.constant.BC;
 import com.cooler.ai.nlg.NlgConstant;
+import com.cooler.ai.nlg.entity.NlgGuidesInfo;
 import com.cooler.ai.nlg.entity.NlgTemplateInfo;
 import com.cooler.ai.platform.action.BaseInteractiveTaskAction;
 import com.cooler.ai.platform.facade.constance.Constant;
@@ -20,7 +21,7 @@ import java.util.*;
  * @Date 2018/12/25
  **/
 @Component("showShoppingcartTaskAction")
-public class ShowShoppingcartTaskAction extends BaseInteractiveTaskAction {
+public class ShowShoppingcartTaskAction extends BaseInnerInteractTaskAction {
     private Logger logger = LoggerFactory.getLogger(ShowShoppingcartTaskAction.class);
 
     private final Set<String> intentNames = new HashSet<>(Arrays.asList("order_deal", "pay"));
@@ -57,9 +58,9 @@ public class ShowShoppingcartTaskAction extends BaseInteractiveTaskAction {
                 break;
             }
         }
-        NlgTemplateInfo nlgTemplateInfo = getNlgTemplateInfoOfDefaultTheme(this.getClass(), transformIntentName, intentName, paramKvs);
-        String reply = nlgTemplateInfo.getNlgTemplate();
-        return new Message("text", reply);
+        NlgGuidesInfo nlgGuidesInfo = getNlgGuidesInfoOfDefaultTheme(this.getClass(), transformIntentName, intentName, paramKvs);
+        String nlgSentence = addNlgGuidesInfoToBizMap(nlgGuidesInfo, Constant.ONE);
+        return new Message(Constant.MSG_TEXT, nlgSentence);
     }
 
 }

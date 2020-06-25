@@ -2,6 +2,7 @@ package com.cooler.ai.dm.taskaction.interact;
 
 import com.alibaba.fastjson.JSON;
 import com.cooler.ai.dm.constant.BC;
+import com.cooler.ai.nlg.entity.NlgGuidesInfo;
 import com.cooler.ai.nlg.entity.NlgTemplateInfo;
 import com.cooler.ai.platform.action.BaseInteractiveTaskAction;
 import com.cooler.ai.platform.facade.constance.Constant;
@@ -19,7 +20,7 @@ import java.util.Map;
  * @Date 2018/12/25
  **/
 @Component("showPoiListTaskAction")
-public class ShowPoiListTaskAction extends BaseInteractiveTaskAction {
+public class ShowPoiListTaskAction extends BaseInnerInteractTaskAction {
 
     private Logger logger = LoggerFactory.getLogger(ShowPoiListTaskAction.class);
     private final String POI_NAME_VALUED = "poi_name_valued";
@@ -37,17 +38,17 @@ public class ShowPoiListTaskAction extends BaseInteractiveTaskAction {
 
         //构建话术（槽位值替换变量）
         Map<String, String> paramKvs = new HashMap<>();
-        String reply = null;
+        String nlgSentence = null;
         if(poiName != null && poiName.length() > 0){
             paramKvs.put(POI_NAME_VALUED, "true");
             paramKvs.put(BC.POI_NAME, poiName);                                                 //为您找到如下${poi_name}
         }else{
-            paramKvs.put(POI_NAME_VALUED, "false");                                           //为您找到如下商家！
+            paramKvs.put(POI_NAME_VALUED, "false");                                             //为您找到如下商家！
         }
-        NlgTemplateInfo nlgTemplateInfo = getNlgTemplateInfoOfDefaultTheme(this.getClass(), Constant.NONE_VALUE, Constant.NONE_VALUE, paramKvs);
-        reply = nlgTemplateInfo.getNlgTemplate();
 
-        return new Message("text", reply);
+        NlgGuidesInfo nlgGuidesInfo = getNlgGuidesInfoOfDefaultTheme(this.getClass(), Constant.NONE_VALUE, Constant.NONE_VALUE, paramKvs);
+        nlgSentence = addNlgGuidesInfoToBizMap(nlgGuidesInfo, Constant.ONE);
+        return new Message(Constant.MSG_TEXT, nlgSentence);
     }
 
 }

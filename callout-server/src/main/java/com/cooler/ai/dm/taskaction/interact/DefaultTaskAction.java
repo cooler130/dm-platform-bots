@@ -1,6 +1,7 @@
 package com.cooler.ai.dm.taskaction.interact;
 
 import com.cooler.ai.platform.action.BaseInteractiveTaskAction;
+import com.cooler.ai.platform.facade.constance.Constant;
 import com.cooler.ai.platform.facade.model.Message;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -17,6 +18,6 @@ public class DefaultTaskAction extends BaseInteractiveTaskAction {
 
     @Override
     protected Message createReplyMessage() {
-        return new Message("text", "抱歉，没有理解您说的话！");
+        return new Message(Constant.MSG_TEXT, "抱歉，没有理解您说的话！");
     }
 }

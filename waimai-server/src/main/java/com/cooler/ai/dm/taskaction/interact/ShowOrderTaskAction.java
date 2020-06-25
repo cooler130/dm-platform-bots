@@ -1,6 +1,7 @@
 package com.cooler.ai.dm.taskaction.interact;
 
 import com.cooler.ai.dm.constant.BC;
+import com.cooler.ai.nlg.entity.NlgGuidesInfo;
 import com.cooler.ai.nlg.entity.NlgTemplateInfo;
 import com.cooler.ai.platform.action.BaseInteractiveTaskAction;
 import com.cooler.ai.platform.facade.constance.Constant;
@@ -18,7 +19,7 @@ import java.util.Map;
  * @Date 2018/12/25
  **/
 @Component("showOrderTaskAction")
-public class ShowOrderTaskAction extends BaseInteractiveTaskAction {
+public class ShowOrderTaskAction extends BaseInnerInteractTaskAction {
     private Logger logger = LoggerFactory.getLogger(ShowOrderTaskAction.class);
 
     private final String SELECT_ORDERS = "select_orders";
@@ -27,7 +28,7 @@ public class ShowOrderTaskAction extends BaseInteractiveTaskAction {
     protected Message createReplyMessage() {
         Message message = null;
         String msgType = null;
-        String msgText = null;
+        String nlgSentence = null;
         String selectedOrderDataInfosJS = getBizDataValue(BC.SELECTED_ORDER_DATA_INFOS);
 
         Map<String, String> paramKvs = new HashMap<>();
@@ -38,10 +39,10 @@ public class ShowOrderTaskAction extends BaseInteractiveTaskAction {
             msgType = Constant.MSG_TEXT;
             paramKvs.put(SELECT_ORDERS, "true");    //您的订单如下，请确认！;
         }
-        NlgTemplateInfo nlgTemplateInfo = getNlgTemplateInfoOfDefaultTheme(this.getClass(), Constant.NONE_VALUE, Constant.NONE_VALUE, paramKvs);
-        msgText = nlgTemplateInfo.getNlgTemplate();
 
-        message = new Message(msgType, msgText);
+        NlgGuidesInfo nlgGuidesInfo = getNlgGuidesInfoOfDefaultTheme(this.getClass(), Constant.NONE_VALUE, Constant.NONE_VALUE, paramKvs);
+        nlgSentence = addNlgGuidesInfoToBizMap(nlgGuidesInfo, Constant.ONE);
+        message = new Message(msgType, nlgSentence);
         return message;
     }
 }

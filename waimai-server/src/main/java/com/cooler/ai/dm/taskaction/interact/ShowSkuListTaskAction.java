@@ -2,6 +2,7 @@ package com.cooler.ai.dm.taskaction.interact;
 
 import com.alibaba.fastjson.JSON;
 import com.cooler.ai.dm.constant.BC;
+import com.cooler.ai.nlg.entity.NlgGuidesInfo;
 import com.cooler.ai.nlg.entity.NlgTemplateInfo;
 import com.cooler.ai.platform.action.BaseInteractiveTaskAction;
 import com.cooler.ai.platform.facade.constance.Constant;
@@ -21,7 +22,7 @@ import java.util.*;
  * @Date 2018/12/25
  **/
 @Component("showSkuListTaskAction")
-public class ShowSkuListTaskAction extends BaseInteractiveTaskAction {
+public class ShowSkuListTaskAction extends BaseInnerInteractTaskAction {
     private Logger logger = LoggerFactory.getLogger(ShowSkuListTaskAction.class);
 
     private Set<String> payIntentNames = new HashSet<>(Arrays.asList("pay", "order_deal"));
@@ -49,10 +50,10 @@ public class ShowSkuListTaskAction extends BaseInteractiveTaskAction {
 
         Map<String, String> paramKvs2 = new HashMap<>();
         paramKvs2.put(SKU_INFOS_VALUED, skuInfosValued ? "true" : "false");          //true：搜索到如下商品； false：当前没有搜索到商品；
-        NlgTemplateInfo nlgTemplateInfo2 = getNlgTemplateInfoOfDefaultTheme(this.getClass(), Constant.NONE_VALUE, Constant.NONE_VALUE, paramKvs2);
-        String skuReply = nlgTemplateInfo2.getNlgTemplate();
+        NlgGuidesInfo nlgGuidesInfo = getNlgGuidesInfoOfDefaultTheme(this.getClass(), Constant.NONE_VALUE, Constant.NONE_VALUE, paramKvs2); //这个需要向BizDataMap中写nlg和guideOption数据
+        String nlgSentence = addNlgGuidesInfoToBizMap(nlgGuidesInfo, Constant.ONE);
 
-        return new Message("text", poiReply + skuReply);
+        return new Message(Constant.MSG_TEXT, poiReply + nlgSentence);
     }
 
     @Override

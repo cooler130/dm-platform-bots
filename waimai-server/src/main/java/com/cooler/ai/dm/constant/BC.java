@@ -11,6 +11,13 @@ package com.cooler.ai.dm.constant;
  */
 public class BC {
 
+    public static final String REPLY = "reply";                                             //回复语
+
+    public static final String NLG_TEMPLATE_INFO_JS = "nlg_template_info_js";               //nlg模板
+
+    public static final String GUIDE_OPTIONS_JS = "guide_options_js";                       //引导项集合
+
+
     public static final String FAQ_SEARCH_PARAMS = "faq_search_params";                     //FAQ的搜索条件
 
     public static final String FAQ_ANSWER = "faq_answer";                                   //FAQ的答案

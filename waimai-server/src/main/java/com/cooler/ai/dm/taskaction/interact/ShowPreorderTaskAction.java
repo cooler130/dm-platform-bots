@@ -1,6 +1,7 @@
 package com.cooler.ai.dm.taskaction.interact;
 
 import com.cooler.ai.dm.constant.BC;
+import com.cooler.ai.nlg.entity.NlgGuidesInfo;
 import com.cooler.ai.nlg.entity.NlgTemplateInfo;
 import com.cooler.ai.platform.action.BaseInteractiveTaskAction;
 import com.cooler.ai.platform.facade.constance.Constant;
@@ -18,7 +19,7 @@ import java.util.Map;
  * @Date 2018/12/25
  **/
 @Component("showPreorderTaskAction")
-public class ShowPreorderTaskAction extends BaseInteractiveTaskAction {
+public class ShowPreorderTaskAction extends BaseInnerInteractTaskAction {
     private Logger logger = LoggerFactory.getLogger(ShowPreorderTaskAction.class);
 
     private final String PREVIEW_ORDER_DATA_VALUED = "preview_order_data_valued";
@@ -27,7 +28,7 @@ public class ShowPreorderTaskAction extends BaseInteractiveTaskAction {
 
     @Override
     protected Message createReplyMessage() {
-        String bubbleTxt = null;
+        String nlgSentence = null;
 
         Map<String, String> paramKvs = new HashMap<>();
         String preOrderDataInfoJS = getBizDataValue(BC.PREVIEW_ORDER_DATA_INFOS);
@@ -55,10 +56,10 @@ public class ShowPreorderTaskAction extends BaseInteractiveTaskAction {
             //已经最后一页了啊！
             paramKvs.put(PREVIEW_ORDER_DATA_VALUED, "false");
         }
-        NlgTemplateInfo nlgTemplateInfo = getNlgTemplateInfoOfDefaultTheme(this.getClass(), Constant.NONE_VALUE, Constant.NONE_VALUE, paramKvs);
-        bubbleTxt = nlgTemplateInfo.getNlgTemplate();
+        NlgGuidesInfo nlgGuidesInfo = getNlgGuidesInfoOfDefaultTheme(this.getClass(), Constant.NONE_VALUE, Constant.NONE_VALUE, paramKvs);
+        nlgSentence = addNlgGuidesInfoToBizMap(nlgGuidesInfo, Constant.ONE);
 
-        Message bubbleMsg = new Message(Constant.MSG_TEXT, bubbleTxt);
+        Message bubbleMsg = new Message(Constant.MSG_TEXT, nlgSentence);
         return bubbleMsg;
     }
 }
