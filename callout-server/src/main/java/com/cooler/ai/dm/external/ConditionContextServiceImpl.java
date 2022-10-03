@@ -15,6 +15,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 
+import java.util.HashMap;
 import java.util.Map;
 
 /**
@@ -59,42 +60,41 @@ public class ConditionContextServiceImpl implements ConditionContextService {
         ConditionData conditionData = null;
 
         String paramValue = null;
+        Map<String, String> dataMap = new HashMap<>();
         switch (paramsType) {
             case Constant.NULL_PARAM: {
 
                 break;
             }
             case Constant.SLOT_PARAM: {             //在slotOption阶段加入到ParamValueMap中
-                String slotParam = getParamValueFromDataTaskAction(paramsName, paramsType, transition, dmRequest, dialogState, isHadBePreprocessed, bizDataMSMap);
-                paramValue = (slotParam != null) ? slotParam : dialogState.getParamValue(paramsName, Constant.SLOT_PARAM);
+                paramValue = dialogState.getParamValue(paramsName, Constant.SLOT_PARAM);
                 break;
             }
             case Constant.CUSTOM_PARAM:{            //在slotOption阶段加入到ParamValueMap中
-                String customParam = getParamValueFromDataTaskAction(paramsName, paramsType, transition, dmRequest, dialogState, isHadBePreprocessed, bizDataMSMap);
-                paramValue = (customParam != null) ? customParam : dialogState.getParamValue(paramsName, Constant.CUSTOM_PARAM);
+                paramValue = dialogState.getParamValue(paramsName, Constant.CUSTOM_PARAM);
                 break;
             }
             case Constant.PLATFORM_PARAM: {         //在slotOption阶段加入到ParamValueMap中
-                String platformParam = getParamValueFromDataTaskAction(paramsName, paramsType, transition, dmRequest, dialogState, isHadBePreprocessed, bizDataMSMap);
-                paramValue = (platformParam != null) ? platformParam : dialogState.getParamValue(paramsName, Constant.PLATFORM_PARAM);
+                paramValue = dialogState.getParamValue(paramsName, Constant.PLATFORM_PARAM);
                 break;
             }
             case Constant.BIZ_PARAM: {              //此过程获得的参数作为BIZ_PARAM，传出后会在DST阶段加入到ParamValueMap中（此类变量提供了扩展性：如果一类参数在事前不能明确，则可以放到此类型中）
-                paramValue = getParamValueFromDataTaskAction(paramsName, paramsType, transition, dmRequest, dialogState, isHadBePreprocessed, bizDataMSMap);
-
+                dataMap = getParamValueFromDataTaskAction(paramsName, paramsType, transition, dmRequest, dialogState, isHadBePreprocessed, bizDataMSMap);
+                paramValue = dataMap.get(paramsName);
 //                //下面的这句暂时注释掉，因为这个业务数据现在还不能加入到bizDataMSMap中，bizDataMSMap是为ProcessedTaskAction准备存放业务数据的容器，这里只是获取评判数据的过程，获取的业务数据后续会放到DS的paramValueMap中。
                   //与此相对，在各个DataTaskAction中的preprocess()方法，是由于可能对既往的业务数据进行了修改，一但修改，就应该在DS的paramValueMap和bizDataMSMap中进行更新（没有办法的举动），理论上整个DST阶段都不应该加业务数据到bizDataMSMap中。
 //                bizDataMSMap.put(paramsName, new BizDataModelState<>(dialogState.getDmName(), dmRequest.getSessionId(), dmRequest.getTurnNum(), paramsName, paramValue, Constant.ZERO));
                 break;
             }
         }
-        conditionData = new BaseConditionData(conditionRule, conditionLogic, paramsType, paramsName, paramValue, 1f, null, true);
+        conditionData = new BaseConditionData(conditionRule, conditionLogic, paramsType, paramsName, paramValue, 1f, null, true, dataMap);
         return conditionData;
     }
 
-    private String getParamValueFromDataTaskAction(String paramsName, Integer paramsType, Transition transition, DMRequest dmRequest, DialogState dialogState, boolean hadBePreprocessed, Map<String, BizDataModelState<String>> bizDataMSMap) {
+    private Map<String, String> getParamValueFromDataTaskAction(String paramName, Integer paramsType, Transition transition, DMRequest dmRequest, DialogState dialogState, boolean hadBePreprocessed, Map<String, BizDataModelState<String>> bizDataMSMap) {
         String paramValue = null;
-        DataTaskAction dataTaskAction = dataTaskActionMap.get(paramsName);
+        DataTaskAction dataTaskAction = dataTaskActionMap.get(paramName);
+        Map<String, String> datasMap = new HashMap<>();
         if(dataTaskAction != null){
             dataTaskAction.setData(dmRequest, dialogState, bizDataMSMap);
             dataTaskAction.setTransition(transition);
@@ -102,13 +102,14 @@ public class ConditionContextServiceImpl implements ConditionContextService {
                 dataTaskAction.preprocess();                                                                            //没有预处理则先要进行预处理（hadBePreprocessed变量来控制每一个param的这个预处理过程在一轮对话中只有一遍，所以复杂的过程写在这个预处理工作中，这个方法如果更新了）
             }
             paramValue = dataTaskAction.getParamValue();                                                                //预处理之后，则调用DataTaskAction进行数据创建并返回出来。（这个变量值获取过程可能会有多遍）
-            dialogState.addToParamValueMap(paramsName, paramValue, paramsType);                                         //上面4种类型的数据都会经过这个方法，如果此方法获取了新数据，就要在这个时候更新设置到DS中的paramValueMap中
+            dialogState.addToParamValueMap(paramName, paramValue, paramsType);                                         //上面4种类型的数据都会经过这个方法，如果此方法获取了新数据，就要在这个时候更新设置到DS中的paramValueMap中
+            datasMap = dataTaskAction.getPreconditionDatasMap();
+            datasMap.put(paramName, paramValue);
         }else{
             if(paramsType == Constant.BIZ_PARAM){
-                logger.error("警告！业务数据{}，没有配置相关的DataTaskAction，进而无法产生此数据，请联系管理员进行配置！", paramsName);
+                logger.error("警告！业务数据{}，没有配置相关的DataTaskAction，进而无法产生此数据，请联系管理员进行配置！", paramName);
             }
-            paramValue = null;
         }
-        return paramValue;
+        return datasMap;
     }
 }

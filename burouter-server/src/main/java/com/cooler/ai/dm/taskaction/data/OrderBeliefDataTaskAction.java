@@ -5,7 +5,6 @@ import com.cooler.ai.dm.constant.BC;
 import com.cooler.ai.platform.action.BaseDataTaskAction;
 import com.cooler.ai.platform.facade.BuRouterDataFacade;
 import com.cooler.ai.platform.facade.constance.CC;
-import com.cooler.ai.platform.facade.constance.Constant;
 import com.cooler.ai.platform.facade.constance.PC;
 import com.cooler.ai.platform.model.OrderDataInfo;
 import com.cooler.ai.platform.model.TQDataInfo;
